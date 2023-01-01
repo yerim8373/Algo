@@ -21,5 +21,5 @@ Algorithm 문제풀이
 ```bash
 [사이트명] (문제번호) (문제제목) 문제풀이
 [Baekjoon] 1234 아기상어 문제풀이
-[Programmers] 1234 인형뽑기 문제풀이
+[Programmers] L2 인형뽑기 문제풀이
 ```
