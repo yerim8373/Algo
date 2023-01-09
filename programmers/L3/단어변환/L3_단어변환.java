@@ -4,8 +4,8 @@ public class L3_단어변환 {
 	static boolean[] visit;
 	static int answer = 51;
 	public static void main(String[] args) {
-		String[] words = {"hot", "dot", "dog", "lot", "log", "cog"};
-		System.out.println(solution("hit", "cog", words));
+		String[] words = {"abb", "aba"};
+		System.out.println(solution("aab", "aba", words));
 		
 	}
 	
@@ -27,7 +27,7 @@ public class L3_단어변환 {
 		for (int i = 0; i < visit.length; i++) {
 			if(!visit[i] && check(begin, words[i])) {
 				visit[i] = true;
-				dfs(words[i], target, words, cnt++);
+				dfs(words[i], target, words, cnt+1);
 				visit[i] = false;
 			}
 		}
