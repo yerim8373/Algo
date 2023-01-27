@@ -1,5 +1,5 @@
 # Algorithm
-Algorithm 문제풀이
+Algorithm 문제 풀이
 
 ## Project 구조
 ```bash
