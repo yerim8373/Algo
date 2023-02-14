@@ -63,5 +63,4 @@ public class silver1_1697_숨바꼭질 {
         return -1;
     }
 }
-
 ```
