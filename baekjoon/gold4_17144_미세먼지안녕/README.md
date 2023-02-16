@@ -1,79 +1,159 @@
 # 📘 17144 미세먼지 안녕!
 
 ## 소요시간, 메모리
-128ms, 14316KB
+664ms, 296484KB
 
 ## 풀이 방법
 - 구현
-- 12시 방향 위치 저장하는 방식으로 함
-- 비트마스킹으로 계속 돌려도될듯!
+- 공기청정기 돌릴 때 공기청정기 자리랑 한칸 밀리는 자리 초기화 해주기
+- 공기청정기 돌릴 때 범위 주의할 것
+- 배열돌리기풀고 이거 풀면 조음!
 
 ## Code
 
 ```java
-package BAEKJOON;
-
 import java.io.*;
 import java.util.*;
 
-public class gold5_13549_숨바꼭질3 {
-	static int N, K;
-	static int[] time;
+public class gold4_17144_미세먼지안녕 {
+    static int[] dr = {-1, 0, 1, 0};
+    static int[] dc = {0, 1, 0, -1};
+    static int[] dr2 = {1, 0, -1, 0};
+    static int[] dc2 = {0, 1, 0, -1};
+    static int R, C, T, result = 0;
+    static Node[] air = new Node[2];
+    static int[][] map;
+    static Queue<Node> before = new LinkedList<>();
+    static Queue<Node> after = new LinkedList<>();
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		time = new int[100001];
-		for (int i = 0; i < time.length; i++) {
-			time[i] = Integer.MAX_VALUE;
-		}
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        T = Integer.parseInt(st.nextToken());
 
-		dijkstra();
-		//		System.out.println(time[9]);
-		System.out.println(time[K]);
-	}
+        map = new int[R][C];
+        int k = 0;
+        for (int r = 0; r < map.length; r++) {
+            st = new StringTokenizer(br.readLine());
+            for (int c = 0; c < map[r].length; c++) {
+                map[r][c] = Integer.parseInt(st.nextToken());
+                if(map[r][c] == -1) {
+                    air[k] = new Node(r, c, 0);
+                    k++;
+                }
+            }
+        }
 
-	private static void dijkstra() {
-		PriorityQueue<Node> pq = new PriorityQueue<>();
-		pq.offer(new Node(N, 0));
-		time[N] = 0;
+        for (int i = 0; i < T; i++) {
+            check();
+            cal();
+            map = new int[R][C];
+            save();
+            fresh();
+        }
 
-		while(!pq.isEmpty()) {
-			Node cur = pq.poll();
-			if(cur.v == K) {
-				return;
-			} else {
-				if(cur.v-1 >= 0 && time[cur.v-1] > cur.t+1) {
-					time[cur.v-1] = cur.t+1;
-					pq.offer(new Node(cur.v-1, cur.t+1));
-				}
-				if(cur.v*2 <= 100000 && time[cur.v*2] > cur.t) {
-					time[cur.v*2] = cur.t;
-					pq.offer(new Node(cur.v*2, cur.t));
-				}
-				if(cur.v+1 <= 100000 && time[cur.v+1] > cur.t+1) {
-					time[cur.v+1] = cur.t+1;
-					pq.offer(new Node(cur.v+1, cur.t+1));
-				}
-			}
+        count();
+        System.out.println(result);
+    }
 
-		}
-	}
+    private static void count() {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if(map[i][j] != -1) {
+                    result += map[i][j];
+                }
+            }
+        }
+    }
 
-	static class Node implements Comparable<Node>{
-		int v, t;
-		public Node(int v, int t) {
-			this.v = v;
-			this.t = t;
-		}
+    private static void fresh() {
+        Node head = air[0];
+        Node tail = air[1];
+        int r = head.r;
+        int c = head.c;
+        int r2 = tail.r;
+        int c2 = tail.c;
+        int dir = 0;
+        int dir2 = 0;
+        while(true) {
+            int nr = r + dr[dir];
+            int nc = c + dc[dir];
+            if(nr == head.r && nc == head.c) {
+                break;
+            }
+            if(nr>=0 && nr<=head.r && nc>=0 && nc<C) {
+                map[r][c] = map[nr][nc];
+                r = nr; c= nc;
+            } else {
+                dir++;
+            }
+        }
 
-		@Override
-		public int compareTo(Node o) {
-			return Integer.compare(this.t, o.t);
-		}
-	}
+        while(true) {
+            int nr2 = r2 + dr2[dir2];
+            int nc2 = c2 + dc2[dir2];
+            if(nr2 == tail.r && nc2 == tail.c) {
+                break;
+            }
+            if(nr2>=tail.r && nr2<R && nc2>=0 && nc2<C) {
+                map[r2][c2] = map[nr2][nc2];
+                r2 = nr2; c2 = nc2;
+            } else {
+                dir2++;
+            }
+        }
+
+        map[head.r][head.c] = -1;
+        map[head.r][head.c+1] = 0;
+        map[tail.r][tail.c] = -1;
+        map[tail.r][tail.c+1] = 0;
+    }
+
+    private static void save() {
+        while(!after.isEmpty()) {
+            Node cur = after.poll();
+            map[cur.r][cur.c] += cur.cnt;
+        }
+    }
+
+    private static void cal() {
+        while(!before.isEmpty()) {
+            Node cur = before.poll();
+            int num = 0;
+
+            for (int d = 0; d < dr.length; d++) {
+                int nr = cur.r + dr[d];
+                int nc = cur.c + dc[d];
+                if(nr>=0 && nr<R && nc>=0 && nc<C && map[nr][nc] != -1) {
+                    after.offer(new Node(nr, nc, (cur.cnt/5)));
+                    num++;
+                }
+            }
+
+            after.offer(new Node(cur.r, cur.c, (cur.cnt - (cur.cnt/5*num))));
+        }
+    }
+
+    private static void check() {
+        for (int r = 0; r < map.length; r++) {
+            for (int c = 0; c < map[r].length; c++) {
+                if(map[r][c] > 0) {
+                    before.offer(new Node(r, c, map[r][c]));
+                }
+            }
+        }
+    }
+
+    static class Node{
+        int r, c, cnt;
+        public Node(int r, int c, int cnt) {
+            this.r = r;
+            this.c = c;
+            this.cnt = cnt;
+        }
+    }
 }
 
 ```
