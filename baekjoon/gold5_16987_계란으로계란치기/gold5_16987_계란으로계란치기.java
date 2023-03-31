@@ -25,40 +25,38 @@ public class gold5_16987_계란으로계란치기 {
 	
 	private static void dfs(int cur, int cnt, Egg[] eggs) {
 		// 맨 오른쪽 계란이거나 계란이 다 깨졌으면 끗
-		if(cur == eggs.length-1 || cnt == eggs.length) {
+		if(cur == eggs.length || cnt == eggs.length-1) {
 			result = Math.max(result, cnt);
 			return;
 		}
+		
 		// 손에 든 계란이 깨져있으면 걍 넘기기
 		if(eggs[cur].S <= 0) {
 			dfs(cur+1, cnt, eggs);
+			return;
 		}
 		
-		Egg c = eggs[cur];
-		// 모든 계란 깨보기
-		for (int i = cur+1; i < eggs.length; i++) {
-			Egg k = eggs[i];
+		for (int tmp = 0; tmp < eggs.length; tmp++) {
+			int tmpCnt = cnt;
 			
-			if(k.S <= 0) {
-				continue;
+			if(tmp == cur) continue;
+			// 칠 계란이 깨져있는 경우
+			if(eggs[tmp].S <= 0) continue;
+			
+			eggs[cur].S -= eggs[tmp].W;
+			eggs[tmp].S -= eggs[cur].W;
+			
+			if(eggs[cur].S <= 0){
+				tmpCnt++;
 			}
-			// 둘 다 깨질 경우
-			if(c.S - k.W <= 0 && k.S - c.W <= 0) {
-				eggs[cur].S -= k.W;
-				eggs[i].S -= c.W;
-				dfs(cur+1, cnt+2, eggs);
-			} else {
-				// 들고있는 계란이 깨질 경우
-				if(c.S - k.W <= 0) {
-					eggs[cur].S -= k.W;
-					dfs(cur+1, cnt+1, eggs);
-				}
-				// 친 계란이 깨진 경우
-				else if(k.S - c.W <= 0) {
-					eggs[i].S -= c.W;
-					dfs(cur, cnt+1, eggs);
-				}
+			if(eggs[tmp].S <= 0) {
+				tmpCnt++;
 			}
+			
+			dfs(cur+1, tmpCnt, eggs);
+			
+			eggs[cur].S += eggs[tmp].W;
+			eggs[tmp].S += eggs[cur].W;
 		}
 	}
 
