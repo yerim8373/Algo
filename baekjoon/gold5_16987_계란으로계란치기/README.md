@@ -1,10 +1,14 @@
 # 📘 16987 계란으로 계란치기
 
 ## 소요시간, 메모리
-ms, KB
+208ms, 15284KB
 
 ## 풀이 방법
-- 
+- dfs, 백트래킹
+- 모든 계란을 다 쳐보기
+- 손에든 계란이 맨 오른쪽이거나, 모든 계란이 다 깨졌으면 return
+- 손에든 계란이 깨져있으면 다음꺼 탐색
+- 모든 계란 탐색하면서 쳐야하는 계란이 깨져있는 경우 continue
 
 ## Code
 
@@ -14,73 +18,71 @@ package BAEKJOON;
 import java.io.*;
 import java.util.*;
 
-public class gold5_2589_보물섬 {
-    static int[] dr = {-1, 0, 1, 0};
-    static int[] dc = {0, 1, 0, -1};
-    static int R, C, result = 0;
-    static char[][] map;
-    static boolean[][] v;
+public class gold5_16987_계란으로계란치기 {
+	static int result = 0;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        R = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
-        map = new char[R][C];
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		int N = Integer.parseInt(br.readLine());
+		Egg[] eggs = new Egg[N];
 
-        for (int r = 0; r < R; r++) {
-            String str = br.readLine();
-            for (int c = 0; c < C; c++) {
-                map[r][c] = str.charAt(c);
-            }
-        }
+		for (int i = 0; i < N; i++) {
+			st = new StringTokenizer(br.readLine());
+			int S = Integer.parseInt(st.nextToken());
+			int W = Integer.parseInt(st.nextToken());
+			eggs[i] = new Egg(S, W);
+		}
+		// 백트래킹
+		dfs(0, 0, eggs);
+		System.out.println(result);
+	}
 
-        // 대륙 나누기
-        // 대륙에서 각 칸마다 최장거리 구하기 -> bfs 돌려서 최댓값
-        // 그 중 큰거... -> 어차피 모든 정점에서 bfs 돌릴거라 대륙 안나눠도될듯
-        for (int r = 0; r < map.length; r++) {
-            for (int c = 0; c < map[r].length; c++) {
-                if(map[r][c] == 'L') {
-                    bfs(new Node(r, c, 0));
-                }
-            }
-        }
+	private static void dfs(int cur, int cnt, Egg[] eggs) {
+		// 맨 오른쪽 계란이거나 계란이 다 깨졌으면 끗
+		if(cur == eggs.length || cnt == eggs.length-1) {
+			result = Math.max(result, cnt);
+			return;
+		}
 
-        System.out.println(result);
-    }
+		// 손에 든 계란이 깨져있으면 걍 넘기기
+		if(eggs[cur].S <= 0) {
+			dfs(cur+1, cnt, eggs);
+			return;
+		}
 
-    private static void bfs(Node node) {
-        v = new boolean[R][C];
-        Queue<Node> queue = new LinkedList<>();
-        queue.offer(node);
-        v[node.r][node.c] = true;
-        int max = node.cnt;
+		for (int tmp = 0; tmp < eggs.length; tmp++) {
+			int tmpCnt = cnt;
 
-        while(!queue.isEmpty()) {
-            Node cur = queue.poll();
-            max = Math.max(max, cur.cnt);
+			if(tmp == cur) continue;
+			// 칠 계란이 깨져있는 경우
+			if(eggs[tmp].S <= 0) continue;
 
-            for (int d = 0; d < dc.length; d++) {
-                int nr = cur.r + dr[d];
-                int nc = cur.c + dc[d];
-                if(nr>=0 && nr<R && nc>=0 && nc<C && !v[nr][nc] && map[nr][nc] == 'L') {
-                    v[nr][nc] = true;
-                    queue.offer(new Node(nr, nc, cur.cnt+1));
-                }
-            }
-        }
+			eggs[cur].S -= eggs[tmp].W;
+			eggs[tmp].S -= eggs[cur].W;
 
-        result = Math.max(result, max);
-    }
+			if(eggs[cur].S <= 0){
+				tmpCnt++;
+			}
+			if(eggs[tmp].S <= 0) {
+				tmpCnt++;
+			}
 
-    static class Node{
-        int r, c, cnt;
-        public Node(int r, int c, int cnt) {
-            this.r = r;
-            this.c = c;
-            this.cnt = cnt;
-        }
-    }
+			dfs(cur+1, tmpCnt, eggs);
+
+			eggs[cur].S += eggs[tmp].W;
+			eggs[tmp].S += eggs[cur].W;
+		}
+	}
+
+	static class Egg {
+		int S, W;
+
+		public Egg(int S, int W) {
+			this.S = S;
+			this.W = W;
+		}
+	}
 }
 
 ```

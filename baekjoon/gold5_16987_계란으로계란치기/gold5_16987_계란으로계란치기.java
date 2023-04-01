@@ -18,7 +18,7 @@ public class gold5_16987_계란으로계란치기 {
 			int W = Integer.parseInt(st.nextToken());
 			eggs[i] = new Egg(S, W);
 		}
-		// 완탐?
+		// 백트래킹
 		dfs(0, 0, eggs);
 		System.out.println(result);
 	}
