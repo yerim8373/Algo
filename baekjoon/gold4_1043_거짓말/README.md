@@ -1,156 +1,126 @@
 # 📘 1043 거짓말
 
 ## 소요시간, 메모리
-664ms, 296484KB
+128ms, 14272KB
 
 ## 풀이 방법
-- 
+- union-find
+- 파티원 입력받으면서 같은 파티인 사람끼리 합치기 (union)
+- union에서 부모는 작은 수가 되도록 함
+- 다 연결한 후 진실 아는 사람이면 그 사람이랑 부모가 똑같은 사람들도 true 만들기
+- 부모 찾는 과정에서 find() 함수 써줌 -> parent[] 로 비교하면 root로 비교못함
+- 다 바꿔주고 파티 돌면서 진실 아는 사람있는지 체크
 
 ## Code
 
 ```java
+package BAEKJOON;
+
 import java.io.*;
 import java.util.*;
 
-public class gold4_17144_미세먼지안녕 {
-    static int[] dr = {-1, 0, 1, 0};
-    static int[] dc = {0, 1, 0, -1};
-    static int[] dr2 = {1, 0, -1, 0};
-    static int[] dc2 = {0, 1, 0, -1};
-    static int R, C, T, result = 0;
-    static Node[] air = new Node[2];
-    static int[][] map;
-    static Queue<Node> before = new LinkedList<>();
-    static Queue<Node> after = new LinkedList<>();
+public class gold4_1043_거짓말 {
+    static int N, M, result = 0;
+    static boolean[] tArr;
+    static int[] parent;
+    static ArrayList<Integer>[] party;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        R = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
-        T = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        tArr = new boolean[N+1];
+        parent = new int[N+1];
+        party = new ArrayList[M];
 
-        map = new int[R][C];
-        int k = 0;
-        for (int r = 0; r < map.length; r++) {
+        for (int i = 0; i < parent.length; i++) {
+            parent[i] = i;
+        }
+
+        st = new StringTokenizer(br.readLine());
+        int T = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < T; i++) {
+            // 진실 아는 사람
+            tArr[Integer.parseInt(st.nextToken())] = true;
+        }
+
+        int pre = 0;
+        // 파티원 입력받기
+        for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int c = 0; c < map[r].length; c++) {
-                map[r][c] = Integer.parseInt(st.nextToken());
-                if(map[r][c] == -1) {
-                    air[k] = new Node(r, c, 0);
-                    k++;
+            int p = Integer.parseInt(st.nextToken());
+            party[i] = new ArrayList<Integer>();
+
+            // 처음 사람은 그냥 넣기 (root)
+            if(p > 0) {
+                pre = Integer.parseInt(st.nextToken());
+                party[i].add(pre);
+            }
+
+            // 같은 파티끼리 합치기 -> 부모 무조건 작은애들임
+            for (int j = 1; j < p; j++) {
+                int a = Integer.parseInt(st.nextToken());
+                party[i].add(a);
+                union(pre, a);
+                pre = a;
+            }
+        }
+
+
+        // 진실 아는 사람의 주변 사람들도 true로 바꿔주기 -> 부모가 같으면 ok
+        // 부모 비교할 때, parent[j] == parent[i] 가 아니라 find 함수로 부모를 찾아줘야함!!!!!
+        for (int i = 1; i < tArr.length; i++) {
+            if(tArr[i]) {
+                for (int j = 1; j < tArr.length; j++) {
+                    if(find(j) == find(i)) {
+                        tArr[j] = true;
+                    }
                 }
             }
         }
 
-        for (int i = 0; i < T; i++) {
-            check();
-            cal();
-            map = new int[R][C];
-            save();
-            fresh();
+        for (int i = 1; i < parent.length; i++) {
+            System.out.println(i + " : " + tArr[i] + " " + parent[i]);
         }
 
-        count();
+
+        // 파티에 진실 아는 사람 있는지 체크
+        for (int i = 0; i < party.length; i++) {
+            boolean chk = false;
+            for (int j = 0; j < party[i].size(); j++) {
+                if(tArr[party[i].get(j)]) {
+                    chk = true;
+                    System.out.println(i);
+                    break;
+                }
+            }
+            if(!chk)
+                result++;
+        }
+
         System.out.println(result);
     }
 
-    private static void count() {
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
-                if(map[i][j] != -1) {
-                    result += map[i][j];
-                }
-            }
+    private static void union(int a, int b) {
+        a = find(a);
+        b = find(b);
+//		if(a != b)
+//			parent[b] = a;
+        if(a < b) {
+            parent[b] = a;
+        } else if(a > b) {
+            parent[a] = b;
         }
     }
 
-    private static void fresh() {
-        Node head = air[0];
-        Node tail = air[1];
-        int r = head.r;
-        int c = head.c;
-        int r2 = tail.r;
-        int c2 = tail.c;
-        int dir = 0;
-        int dir2 = 0;
-        while(true) {
-            int nr = r + dr[dir];
-            int nc = c + dc[dir];
-            if(nr == head.r && nc == head.c) {
-                break;
-            }
-            if(nr>=0 && nr<=head.r && nc>=0 && nc<C) {
-                map[r][c] = map[nr][nc];
-                r = nr; c= nc;
-            } else {
-                dir++;
-            }
-        }
-
-        while(true) {
-            int nr2 = r2 + dr2[dir2];
-            int nc2 = c2 + dc2[dir2];
-            if(nr2 == tail.r && nc2 == tail.c) {
-                break;
-            }
-            if(nr2>=tail.r && nr2<R && nc2>=0 && nc2<C) {
-                map[r2][c2] = map[nr2][nc2];
-                r2 = nr2; c2 = nc2;
-            } else {
-                dir2++;
-            }
-        }
-
-        map[head.r][head.c] = -1;
-        map[head.r][head.c+1] = 0;
-        map[tail.r][tail.c] = -1;
-        map[tail.r][tail.c+1] = 0;
+    private static int find(int a) {
+        if(parent[a] == a)
+            return a;
+        else
+            return parent[a] = find(parent[a]);
     }
 
-    private static void save() {
-        while(!after.isEmpty()) {
-            Node cur = after.poll();
-            map[cur.r][cur.c] += cur.cnt;
-        }
-    }
-
-    private static void cal() {
-        while(!before.isEmpty()) {
-            Node cur = before.poll();
-            int num = 0;
-
-            for (int d = 0; d < dr.length; d++) {
-                int nr = cur.r + dr[d];
-                int nc = cur.c + dc[d];
-                if(nr>=0 && nr<R && nc>=0 && nc<C && map[nr][nc] != -1) {
-                    after.offer(new Node(nr, nc, (cur.cnt/5)));
-                    num++;
-                }
-            }
-
-            after.offer(new Node(cur.r, cur.c, (cur.cnt - (cur.cnt/5*num))));
-        }
-    }
-
-    private static void check() {
-        for (int r = 0; r < map.length; r++) {
-            for (int c = 0; c < map[r].length; c++) {
-                if(map[r][c] > 0) {
-                    before.offer(new Node(r, c, map[r][c]));
-                }
-            }
-        }
-    }
-
-    static class Node{
-        int r, c, cnt;
-        public Node(int r, int c, int cnt) {
-            this.r = r;
-            this.c = c;
-            this.cnt = cnt;
-        }
-    }
 }
 
 ```
