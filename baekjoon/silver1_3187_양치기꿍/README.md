@@ -1,68 +1,98 @@
 # 📘 3187 양치기 꿍
 
 ## 소요시간, 메모리
-140ms, 14572KB
+212ms, 18576KB
 
 ## 풀이 방법
-- dfs
+- bfs
+- 늑대 or 양 나오면 bfs 돌리기
+- bfs 끝날 때 양, 늑대 수 비교해서 결과값에 더하기
 
 ## Code
 
 ```java
 package BAEKJOON;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-public class silver1_1189_컴백홈 {
-    static int[] dr = {-1, 0, 1, 0};
-    static int[] dc = {0, 1, 0, -1};
-    static int R, C, K, result = 0;
+public class silver1_3187_양치기꿍 {
+	static int[] dr = {-1, 0, 1, 0};
+	static int[] dc = {0, 1, 0, -1};
+	static int R, C, result_sheep = 0, result_wolf = 0;
+	static char[][] map;
+	static boolean[][] visit;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        R = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
-        int[][] map = new int[R][C];
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		R = Integer.parseInt(st.nextToken());
+		C = Integer.parseInt(st.nextToken());
+		map = new char[R][C];
+		visit = new boolean[R][C];
 
-        for (int r = 0; r < map.length; r++) {
-            String str = br.readLine();
-            for (int c = 0; c < map[r].length; c++) {
-                if(str.charAt(c) == 'T') {
-                    map[r][c] = 1;
-                }
-            }
-        }
+		for (int r = 0; r < map.length; r++) {
+			String str = br.readLine();
+			for (int c = 0; c < map[r].length; c++) {
+				map[r][c] = str.charAt(c);
+			}
+		}
 
-        map[R-1][0] = 1;
-        dfs(R-1, 0, 1, map);
 
-        System.out.println(result);
-    }
+		for (int r = 0; r < map.length; r++) {
+			for (int c = 0; c < map[r].length; c++) {
+				if(!visit[r][c]) {
+					if(map[r][c] == 'v' || map[r][c] == 'k') {
+						bfs(new Node(r, c));
+					}
+				}
+			}
+		}
 
-    private static void dfs(int r, int c, int cnt, int[][] map) {
-        if(cnt == K) {
-            if(r == 0 && c == C-1) {
-                result++;
-            }
-            return;
-        }
+		System.out.println(result_sheep + " " + result_wolf);
+	}
 
-        for (int d = 0; d < dr.length; d++) {
-            int nr = r + dr[d];
-            int nc = c + dc[d];
-            if(nr>=0 && nr<R && nc>=0 && nc<C && map[nr][nc] == 0) {
-                map[nr][nc] = 1;
-                dfs(nr, nc, cnt+1, map);
-                map[nr][nc] = 0;
-            }
-        }
-    }
+	private static void bfs(Node node) {
+		Queue<Node> queue = new LinkedList<>();
+		queue.offer(node);
+		visit[node.r][node.c] = true;
 
+		int sheep = 0, wolf = 0;
+
+		while(!queue.isEmpty()) {
+			Node cur = queue.poll();
+
+			if(map[cur.r][cur.c] == 'v') {
+				wolf++;
+			} else if(map[cur.r][cur.c] == 'k') {
+				sheep++;
+			}
+
+			for(int d = 0; d < dr.length; d++) {
+				int nr = cur.r + dr[d];
+				int nc = cur.c + dc[d];
+				if(nr>=0 && nr<R && nc>=0 && nc<C && !visit[nr][nc] && map[nr][nc] != '#') {
+					visit[nr][nc] = true;
+					queue.offer(new Node(nr, nc));
+				}
+			}
+		}
+
+		if(sheep > wolf) {
+			result_sheep += sheep;
+		} else {
+			result_wolf += wolf;
+		}
+	}
+
+	static class Node{
+		int r, c;
+		public Node(int r, int c) {
+			this.r = r;
+			this.c = c;
+		}
+	}
 }
+
 
 ```
