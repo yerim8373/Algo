@@ -9,6 +9,9 @@ ms, KB
 - 1부터 모든 노드 탐색하도록 함
 - 70퍼에서 자꾸 오류 why??
 
+## 해결 완료👌🏻
+- -1 출력할 때 공백 추가 안해줬었음
+
 ## Code
 
 ```java
@@ -23,7 +26,8 @@ public class silver1_14218_그래프탐색2 {
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+		StringTokenizer 
+            st = new StringTokenizer(br.readLine());
 		StringBuilder sb = new StringBuilder();
 		int n = Integer.parseInt(st.nextToken());
 		int m = Integer.parseInt(st.nextToken());
@@ -54,7 +58,7 @@ public class silver1_14218_그래프탐색2 {
 
 			sb.append(0 + " ");
 			for (int j = 2; j < arr.length; j++) {
-				sb.append(arr[j] == 0 ? -1 : arr[j] + " ");
+				sb.append(arr[j] == 0 ? -1 + " " : arr[j] + " ");
 			}
 			sb.append("\n");
 		}
