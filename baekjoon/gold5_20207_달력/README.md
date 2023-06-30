@@ -1,102 +1,51 @@
-# 📘 15686 치킨 배달
+# 📘 20207 달력
 
 ## 소요시간, 메모리
-208ms, 15700KB
+148ms, 15140KB
 
 ## 풀이 방법
-1. 치킨집, 집 위치 arraylist에 담기
-2. 치킨집 개수 중 M개씩 조합
-3. 조합돌리면서 집마다 치킨거리 구하기
-4. 치킨거리 최솟값 갱신
+- 구현
+- 입력받은 기간동안 배열에 카운트하기
+- 카운트한거 기반으로 직사각형 가로 세로 크기 구해서 면적 더해주기
+- 마지막에는 더해지지 않으므로 마지막에 한번 더 더해주는 계산을 해야함❕
 
 ## Code
 
 ```java
-package BAEKJOON;
-
 import java.io.*;
 import java.util.*;
 
-public class gold5_15686_치킨배달 {
-	static int N, M, result = Integer.MAX_VALUE;
-	static int[][] map;
-	static ArrayList<Node> chi_list = new ArrayList<>();
-	static ArrayList<Node> home_list = new ArrayList<>();
-	static int[] comb;
-	static boolean[] visit;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+        int N = Integer.parseInt(br.readLine());
+        int min = 366, max = 0;
+        int[] arr = new int[366];
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            int start = Integer.parseInt(st.nextToken());
+            int end = Integer.parseInt(st.nextToken());
+            min = Math.min(min, start);
+            max = Math.max(max, end);
+            for (int j = start; j <= end; j++) {
+                arr[j]++;
+            }
+        }
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		map = new int[N][N];
+        int col = 0, row = 0, result = 0;
+        for (int i = min; i <= max; i++) {
+            if(arr[i] > 0) {
+                col++;
+                row = Math.max(row, arr[i]);
+            } else {
+                result += col * row;
+                col = 0; row = 0;
+            }
+        }
+        result += col * row;
 
-		for (int r = 0; r < map.length; r++) {
-			st = new StringTokenizer(br.readLine());
-			for (int c = 0; c < map[r].length; c++) {
-				map[r][c] = Integer.parseInt(st.nextToken());
-				if(map[r][c] == 2) {
-					chi_list.add(new Node(r+1, c+1));
-				} else if(map[r][c] == 1) {
-					home_list.add(new Node(r+1, c+1));
-				}
-			}
-		}
-
-		comb = new int[M];
-		visit = new boolean[chi_list.size()];
-
-		for (int i = 0; i < chi_list.size(); i++) {
-			visit[i] = true;
-			comb[0] = i;
-			combination(i, 1);
-			visit[i] = false;
-		}
-
-		System.out.println(result);
-	}
-
-	private static void combination(int k, int cnt) {
-		if(cnt == M) {
-			play();
-			return;
-		}
-
-		for (int i = k+1; i < chi_list.size(); i++) {
-			if(!visit[i]) {
-				visit[i] = true;
-				comb[cnt] = i;
-				combination(i, cnt+1);
-				visit[i] = false;
-			}
-		}
-	}
-
-	private static void play() {
-		int home_chi = 0; // 조합 -치킨거리
-		for (int i = 0; i < home_list.size(); i++) {
-			// 집에서 치킨집까지 거리 최솟값
-			int min_home = Integer.MAX_VALUE;
-			for (int j = 0; j < comb.length; j++) {
-				Node h = home_list.get(i);
-				Node c = chi_list.get(comb[j]);
-				min_home = Math.min(min_home, Math.abs(h.r-c.r)+Math.abs(h.c-c.c));
-			}
-			home_chi += min_home;
-		}
-
-		result = Math.min(result, home_chi);
-	}
-
-	static class Node{
-		int r, c;
-		public Node(int r, int c) {
-			this.r = r;
-			this.c = c;
-		}
-	}
+        System.out.println(result);
+    }
 }
-
-
 ```
