@@ -1,18 +1,3 @@
-# 📘 22251 빌런 호석
-
-## 소요시간, 메모리
-276ms, 53080KB
-
-## 풀이 방법
-- 구현
-- 모든 수가 디스플레이에 표현되는 위치를 number 배열에 저장
-- 현재 층수를 자릿수에 맞게 배열에 저장
-- 1부터 N층까지 탐색하기
-- 목표 층수를 자릿수에 맞게 배열에 저장한 후 현재 층수와 몇개 차이나는지 체크하기
-
-## Code
-
-```java
 package Baekjoon;
 
 import java.io.BufferedReader;
@@ -78,4 +63,3 @@ public class gold5_22251_빌런호석 {
         return true;
     }
 }
-```
