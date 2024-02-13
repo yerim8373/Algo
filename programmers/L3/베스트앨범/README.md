@@ -11,7 +11,7 @@
 5. 정렬된 music 하나를 List<Integer>에 넣어주고, 장르에 music이 2개 이상이면 하나 더 넣어준다.
 6. List<Integer>로 정렬되어있는 노래 순서를 int[]로 바꿔준다.
    - answer = result.stream().mapToInt(i -> i).toArray();
-- ** stream을 잘 활용하자 ❕ **
+- **stream을 잘 활용하자 ❕**
 
 ## Code
 
