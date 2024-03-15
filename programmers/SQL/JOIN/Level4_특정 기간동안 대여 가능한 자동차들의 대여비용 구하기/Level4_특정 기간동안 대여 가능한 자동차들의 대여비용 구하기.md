@@ -53,3 +53,5 @@ ORDER BY FEE DESC, CAR_TYPE, CAR_ID DESC;
              # FROM car_rental_company_discount_plan
                         # WHERE SUBSTRING(duration_type, 1, 2) = 30;
 ```
+
+---
