@@ -38,7 +38,7 @@ ORDER BY e.emp_no;
 
 ------
 
-#### 💡 CASE WHEN THEN
+#### 💡 CASE WHEN THEN ⭐
 
 ```SQL
 CASE
