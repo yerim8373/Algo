@@ -16,4 +16,4 @@ FROM (SELECT TO_CHAR(sales_date, 'YYYY-MM-DD') AS sales_date, product_id, user_i
 ORDER BY sales_date, product_id, user_id;
 ```
 
-------
+-----
